@@ -1,0 +1,9 @@
+SELECT r.fingerprint  /* USER fingerprint */
+
+FROM 
+	users u
+	LEFT JOIN resources r ON r.fingerprint = u.fingerprint
+	LEFT JOIN auditing ON u.fingerprint = auditing.trueuser_fp AND auditing.service_fp =1099512610819
+WHERE
+	u.userstatus = 4417 /* Active users only */ AND
+    auditing.lastmodified_utc >= DATE_SUB(UTC_TIMESTAMP,INTERVAL 40 DAY)

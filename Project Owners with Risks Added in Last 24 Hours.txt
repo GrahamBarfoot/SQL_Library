@@ -1,0 +1,14 @@
+SELECT fingerprint 
+	FROM users 
+	WHERE fingerprint IN 
+(SELECT users.fingerprint 
+	FROM projects JOIN 
+	abstract_projects 
+	ON abstract_projects.fingerprint = projects.fingerprint JOIN 
+	project_role_assigns 
+	ON abstract_projects.owningprojectrole_fp = project_role_assigns.projectrole_fp JOIN 
+	users 
+	ON project_role_assigns.user_fp = users.fingerprint JOIN 
+	project_risks 
+	ON projects.fingerprint = project_risks.project_fp
+	WHERE project_risks.created_utc > NOW() - INTERVAL 24 HOUR)

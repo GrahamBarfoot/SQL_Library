@@ -1,0 +1,48 @@
+SELECT fingerprint
+  FROM users AS u
+ WHERE EXISTS (
+         SELECT NULL
+           FROM metric_role_assigns AS mra
+          WHERE EXISTS (
+                  SELECT NULL
+                    FROM metrics AS m
+                   WHERE EXISTS (
+                           SELECT NULL
+                             FROM metric_performance_data mpd
+                            WHERE mpd.performanceindextls = 4129
+                              AND mpd.fingerprint = m.performancedata_fp
+                         )
+                     AND EXISTS (
+                           SELECT NULL
+                             FROM custom_attributes AS ca
+                            WHERE ca.declaration_fp = 737745913960213133
+                              AND ca.boolean_value IS TRUE
+                              AND ca.entity_fp = m.fingerprint
+                         )
+                     AND NOT EXISTS (
+                           SELECT NULL
+                             FROM metric_journals AS mj
+                            WHERE mj.assocrange_startperiod_fp = (
+                                    SELECT fingerprint
+                                      FROM calendar_periods
+                                     WHERE tier_fp = 737745913958705998
+                                       AND startdate_local = (
+                                             MAKEDATE(EXTRACT(YEAR FROM CURRENT_DATE()), 1)
+                                             + INTERVAL EXTRACT(MONTH FROM CURRENT_DATE()) - 1 MONTH
+                                           )
+                                  )
+                              AND mj.assocrange_finishperiod_fp = (
+                                    SELECT fingerprint
+                                      FROM calendar_periods
+                                     WHERE tier_fp = 737745913958705998
+                                       AND startdate_local = (
+                                             MAKEDATE(EXTRACT(YEAR FROM CURRENT_DATE()), 1)
+                                             + INTERVAL EXTRACT(MONTH FROM CURRENT_DATE()) - 1 MONTH
+                                           )
+                                  )
+                              AND mj.metric_fp = mj.fingerprint
+                         )
+                     AND m.owningmetricrole_fp = mra.metricrole_fp
+                )
+            AND mra.user_fp = u.fingerprint
+        )
