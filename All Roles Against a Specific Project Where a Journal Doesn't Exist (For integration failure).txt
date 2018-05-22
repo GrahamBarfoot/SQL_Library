@@ -1,0 +1,11 @@
+SELECT u.fingerprint FROM users u INNER JOIN project_role_assigns pra ON u.fingerprint = user_fp
+    INNER JOIN project_roles pr ON pra.projectrole_fp = pr.fingerprint
+    INNER JOIN projects p ON pr.project_fp = p.fingerprint
+WHERE CASE WHEN EXISTS (
+SELECT pj.*
+FROM projects p INNER JOIN project_journals pj ON p.fingerprint = pj.project_fp
+WHERE p.id = 252 --Project ID--
+    AND pj.title LIKE 'The IFS routine%' --Project Journal Title--
+    AND created_loc > DATE_ADD(CURRENT_TIMESTAMP, INTERVAL -10 HOUR) --Looks for a Journal in the previous 10 hours--
+    ) THEN 1 ELSE 0 END = 0
+AND p.id = 252 --Project ID--

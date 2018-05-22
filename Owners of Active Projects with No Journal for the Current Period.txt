@@ -1,0 +1,40 @@
+SELECT fingerprint FROM users AS u
+ WHERE EXISTS (
+         SELECT NULL
+           FROM project_role_assigns AS pra
+          WHERE EXISTS (
+                  SELECT NULL
+                    FROM abstract_projects AS ap
+                   WHERE EXISTS (
+                           SELECT NULL
+                             FROM projects AS p
+                            WHERE p.projectstatus = 4289
+                              AND p.fingerprint = ap.fingerprint
+                         )
+                     AND NOT EXISTS (
+                           SELECT NULL
+                             FROM project_journals AS pj
+                            WHERE pj.assocrange_startperiod_fp = (
+                                    SELECT fingerprint
+                                      FROM calendar_periods
+                                     WHERE tier_fp = 737745913958705998
+                                       AND startdate_local = (
+                                             MAKEDATE(EXTRACT(YEAR FROM CURRENT_DATE()), 1)
+                                             + INTERVAL EXTRACT(MONTH FROM CURRENT_DATE()) - 1 MONTH
+                                           )
+                                  )
+                              AND pj.assocrange_finishperiod_fp = (
+                                    SELECT fingerprint
+                                      FROM calendar_periods
+                                     WHERE tier_fp = 737745913958705998
+                                       AND startdate_local = (
+                                             MAKEDATE(EXTRACT(YEAR FROM CURRENT_DATE()), 1)
+                                             + INTERVAL EXTRACT(MONTH FROM CURRENT_DATE()) - 1 MONTH
+                                           )
+                                  )
+                              AND pj.project_fp = ap.fingerprint
+                         )
+                     AND ap.owningprojectrole_fp = pra.projectrole_fp
+                )
+            AND pra.user_fp = u.fingerprint
+        )
